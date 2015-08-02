@@ -1,0 +1,22 @@
+{
+  "name": "plissken",
+  "version": "1.0.0",
+  "description": "One-way REST-based data synchronization utility",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [
+    "rest",
+    "sync",
+    "synchronization",
+    "import",
+    "api",
+    "remote"
+  ],
+  "author": "Martin Kock",
+  "license": "MIT",
+  "dependencies": {
+    "async": "^1.4.0"
+  }
+}
