@@ -11,8 +11,9 @@ var async = require('async'),
 /**
  * @constructor
  */
-function CmdRunner() {
+function CmdRunner(datasrc) {
   this.cmds = [];
+  this.datasrc = datasrc;
 };
 
 /**
@@ -34,6 +35,7 @@ CmdRunner.prototype.run = function run(cmds, next) {
   listCmds(self.cmds);
   // Needs to be async.
   async.waterfall(this.cmds.map(function(cmd) {
+    if (cmd.setDatasrc) cmd.setDatasrc(self.datasrc);
     return async.apply(cmd.exec.bind(cmd));
   }), function(err, sums) {
     return next(err, sums);
