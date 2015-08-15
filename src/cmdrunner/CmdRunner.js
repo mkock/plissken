@@ -6,6 +6,7 @@
 'use strict';
 
 var debug = require('debug')('plissken:CmdRunner'),
+  date = require('date-extended'),
   async = require('async'),
   Cmd = require('./../cmd/Cmd'),
   pagination = require('./pagination');
@@ -74,13 +75,17 @@ CmdRunner.prototype._runPages = function _runPages(next) {
  * @public
  */
 CmdRunner.prototype.run = function run(cmds, next) {
-  var self = this;
+  var self = this,
+    start = new Date(),
+    end;
   validateCmds(cmds);
   this.cmds = cmds;
   listCmds(this.cmds);
   async.doWhilst(this._runPages.bind(self), function() {
     return self.stopFn.call(self.context, self.context.data);
   }, function(err) {
+    end = new Date();
+    debug('Finished in %d seconds', date.difference(start, end, 'seconds'));
     return next(err, self.context.data.content);
   });
 };
