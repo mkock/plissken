@@ -5,7 +5,7 @@
  */
  'use strict';
 
-var debug = require('debug')('plissken:datasrc'),
+var debug = require('debug')('plissken:Datasrc'),
   request = require('request'),
   extend = require('extend');
 

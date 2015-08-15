@@ -20,28 +20,28 @@ module.exports = (function() {
     /**
      * @return {Object} GetCmd
      */
-    createGetCmd: function(relUrl, opts) {
+    newGetCmd: function(relUrl, opts) {
       return new GetCmd(relUrl, opts);
     },
 
     /**
      * @return {Object} LogCmd
      */
-    createLogCmd: function() {
+    newLogCmd: function() {
       return new LogCmd();
     },
 
     /**
      * @return {Object} FilterCmd
      */
-    createFilterCmd: function(filterFunc) {
+    newFilterCmd: function(filterFunc) {
       return new FilterCmd(filterFunc);
     },
 
     /**
      * @return {Object} SelectCmd
      */
-    createSelectCmd: function(selectFunc) {
+    newSelectCmd: function(selectFunc) {
       return new SelectCmd(selectFunc);
     },
 

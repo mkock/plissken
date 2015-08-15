@@ -7,22 +7,22 @@
 
 var plissken = require('./index');
 
-var mock = plissken.createDataSrc({baseUrl: 'http://www.mockapi.net/api/'});
+var mock = plissken.newDataSrc({baseUrl: 'http://www.mockapi.net/api/'});
 
-var getCmd = plissken.CmdFactory.createGetCmd('WspubgByuQgAP3NhF'),
-  selectCmd = plissken.CmdFactory.createSelectCmd(function(elems, next) {
+var getCmd = plissken.CmdFactory.newGetCmd('WspubgByuQgAP3NhF'),
+  selectCmd = plissken.CmdFactory.newSelectCmd(function(elems, next) {
     var vals = [];
     elems.forEach(function(elem) {
       vals.push(elem.value);
     });
     return next(null, vals);
   }),
-  logCmd = plissken.CmdFactory.createLogCmd(),
-  filterCmd = plissken.CmdFactory.createFilterCmd(function(elem, next) {
+  logCmd = plissken.CmdFactory.newLogCmd(),
+  filterCmd = plissken.CmdFactory.newFilterCmd(function(elem, next) {
     return next(elem % 2 === 0);
   }),
-  runner = plissken.createCmdRunner(mock);
-  runner.createContext(function() {
+  runner = plissken.newCmdRunner(mock);
+  runner.newContext(function() {
     this.elems = [];
   });
   runner.paginate(function() {

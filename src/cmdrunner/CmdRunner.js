@@ -24,7 +24,7 @@ function CmdRunner(datasrc) {
 /**
  * @param {Function} User function which can create context data using "this".
  */
-CmdRunner.prototype.createContext = function createContext(fn) {
+CmdRunner.prototype.newContext = function newContext(fn) {
   if (typeof fn !== 'function') {
     throw new Error('First argument must be a function');
   }
@@ -58,12 +58,14 @@ CmdRunner.prototype._runPages = function _runPages(next) {
   this.context.step = 0;
   // Run Cmds one by one.
   async.series(this.cmds.map(function(cmd) {
-    if (cmd.setDatasrc) cmd.setDatasrc(self.datasrc);
-    if (cmd.setPageFn) cmd.setPageFn(self.pageFn);
-    self.context.step++;
-    cmd.setContext(self.context);
-    debug('Starting iteration %d', self.context.step);
-    return async.apply(cmd.exec.bind(cmd));
+    return async.apply(function iteration(aNext) {
+      if (cmd.setDatasrc) cmd.setDatasrc(self.datasrc);
+      if (cmd.setPageFn) cmd.setPageFn(self.pageFn);
+      self.context.step++;
+      cmd.setContext(self.context);
+      debug('Running %s', cmd.getName());
+      return cmd.exec.call(cmd, aNext);
+    });
   }), next);
 };
 

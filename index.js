@@ -11,11 +11,11 @@ var Datasrc = require('./src/datasrc/Datasrc'),
 
 module.exports = {
 
-  createDataSrc: function(opts) {
+  newDataSrc: function(opts) {
     return new Datasrc(opts);
   },
 
-  createCmdRunner: function(datasrc) {
+  newCmdRunner: function(datasrc) {
     return new CmdRunner(datasrc);
   },
 
