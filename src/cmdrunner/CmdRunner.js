@@ -14,6 +14,17 @@ var async = require('async'),
 function CmdRunner(datasrc) {
   this.cmds = [];
   this.datasrc = datasrc;
+  this.context = {};
+};
+
+/**
+ * @param {Function} User function which can create context data using "this".
+ */
+CmdRunner.prototype.createContext = function createContext(func) {
+  if (typeof func !== 'function') {
+    throw new Error('First argument must be a function');
+  }
+  return func.call(this.context);
 };
 
 /**
@@ -33,9 +44,12 @@ CmdRunner.prototype.run = function run(cmds, next) {
     throw new Error('First Cmd must be a GetCmd');
   }
   listCmds(self.cmds);
-  // Needs to be async.
+  self.context.step = 0;
+  // Run Cmds one by one.
   async.waterfall(this.cmds.map(function(cmd) {
     if (cmd.setDatasrc) cmd.setDatasrc(self.datasrc);
+    self.context.step++;
+    cmd.setContext(self.context);
     return async.apply(cmd.exec.bind(cmd));
   }), function(err, sums) {
     return next(err, sums);

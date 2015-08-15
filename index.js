@@ -9,18 +9,16 @@ var Datasrc = require('./src/datasrc/Datasrc'),
   Factory = require('./src/cmdfactory/CmdFactory'),
   CmdRunner = require('./src/cmdrunner/CmdRunner');
 
-var mock = new Datasrc({baseUrl: 'http://www.mockapi.net/api/'});
+module.exports = {
 
-var getCmd = Factory.createGetCmd('/path/to/stuff'),
-  selectCmd = Factory.createSelectCmd(function(elem) {
-    return elem.value;
-  }),
-  logCmd = Factory.createLogCmd(),
-  filterCmd = Factory.createFilterCmd(function(elem) {
-      return elem % 2 === 0;
-    }),
-  runner = new CmdRunner(mock);
+  createDataSrc: function(opts) {
+    return new Datasrc(opts);
+  },
 
-console.log(runner.run([getCmd, selectCmd, filterCmd, logCmd], function(err, sums) {
-  console.log(err, sums);
-}));
+  createCmdRunner: function(datasrc) {
+    return new CmdRunner(datasrc);
+  },
+
+  CmdFactory: Factory
+
+};

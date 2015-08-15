@@ -7,21 +7,23 @@
 
 var debug = require('debug')('plissken:datasrc'),
   request = require('request'),
-  extend = require('extend'),
-  xml2json = require('xml2json');
+  extend = require('extend');
 
 /**
  * @constructor
  */
 function Datasrc(opts) {
-  this.opts = opts;
+  this.opts = extend({
+    headers: {
+      'User-Agent': 'plissken'
+    }
+  }, opts);
 };
 
 /**
  * @param {Object} Options
  */
 function makeOpts(opts, moreOpts) {
-  debug('GET %s', opts.baseUrl + moreOpts.url);
   return checkOpts(extend(opts, moreOpts));
 };
 
@@ -35,26 +37,21 @@ function checkOpts(opts) {
 };
 
 /**
- * @param {String} Body
+ * @param {Object} HTTP response headers
+ * @param {String} HTTP response body
  */
-function toJSON(headers, body) {
-  if (/^application\/json/.test(headers['content-type'])) {
-    return JSON.parse(body);
-  } else if (/^application\/xml/.test(headers['content-type'])) {
-    return xml2json.toJson(body);
-  } else {
-    return body;
-  }
-};
+function toErr(res, body) {
+  return new Error('HTTP/%d %s', res.statusCode, body);
+}
 
 /**
  * @param {Object} Options
  * @param {Function} Next
  */
 Datasrc.prototype.get = function get(opts, next) {
-  return request(makeOpts(this.opts, opts), function(err, response, body) {
-    if (err) return next(err);
-    return next(null, toJSON(response.headers, body));
+  debug('GET %s', opts.baseUrl + opts.url);
+  return request(makeOpts(this.opts, opts), function(err, res, body) {
+    return next(err, {request: opts, response: res, body: body});
   });
 };
 

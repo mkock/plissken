@@ -5,15 +5,23 @@
  */
 'use strict';
 
-var util = require('util'),
-  Cmd = require('./../cmd/Cmd');
+var extend = require('extend'),
+  Cmd = require('./../cmd/Cmd'),
+  accept = require('./accept');
 
 /**
  * @constructor
+ * @param {String} Relative URL from REST service to GET from
+ * @param {Function} Optional function for accepting/rejecting GET response
+ * @param {Object} Optional extra options
  */
-function GetCmd(relUrl, opts) {
+function GetCmd(relUrl, acceptFunc, opts) {
+  if (acceptFunc && typeof acceptFunc !== 'function') {
+    throw new Error('Second argument must be a function');
+  }
   Cmd.call(this, 'GetCmd');
   this.relUrl = relUrl;
+  this.acceptFunc = acceptFunc || accept;
   this.opts = opts || {};
 };
 
@@ -32,8 +40,10 @@ GetCmd.prototype.setDatasrc = function setDatasrc(datasrc) {
  * @return {Object}
  */
 GetCmd.prototype.exec = function exec(next) {
-  return this.datasrc.get({url: 'WspubgByuQgAP3NhF'}, next);
-  // return next(null, [{value: 1}, {value: 2}, {value: 3}, {value: 4}, {value: 5}, {value: 6}, {value: 7}, {value: 8}, {value: 9}, {value: 10}]);
+  var self = this;
+  return this.datasrc.get({url: this.relUrl}, function(err, res) {
+    return self.acceptFunc.call(self.context, err, res, next); // Invoke handler function.
+  });
 };
 
 // Export the constructor.
