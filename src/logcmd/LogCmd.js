@@ -22,12 +22,11 @@ LogCmd.prototype.constructor = LogCmd;
 /*
  * @return {Object}
  */
-LogCmd.prototype.exec = function exec(elems, next) {
-  Array.prototype.forEach.call(elems, function(elem) {
+LogCmd.prototype.exec = function exec(next) {
+  Array.prototype.forEach.call(this.context.data.content, function(elem) {
     console.log(elem);
   });
-  // Pass elems untouched.
-  return next(null, elems);
+  return next();
 };
 
 // Export the constructor.

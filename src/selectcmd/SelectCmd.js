@@ -26,10 +26,16 @@ SelectCmd.prototype.constructor = SelectCmd;
 /*
  * @return {Object}
  */
-SelectCmd.prototype.exec = function exec(elems, next) {
+SelectCmd.prototype.exec = function exec(next) {
   var self = this;
-  console.log('SelectCmd', elems);
-  return next(null, Array.prototype.map.call(elems, self.selectFunc.bind(self.context)));
+  self.selectFunc.call(self.context, self.context.data.content, function(err, content) {
+    if (err) return next(err);
+    self.context.data.content = content;
+    return self.clean(self.context.data.content, function(err, content) {
+      if (!err) self.context.data.content = content;
+      return next(err);
+    });
+  });
 };
 
 // Export the constructor.

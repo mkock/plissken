@@ -5,8 +5,10 @@
  */
 'use strict';
 
-var async = require('async'),
-  Cmd = require('./../cmd/Cmd');
+var debug = require('debug')('plissken:CmdRunner'),
+  async = require('async'),
+  Cmd = require('./../cmd/Cmd'),
+  pagination = require('./pagination');
 
 /**
  * @constructor
@@ -14,17 +16,55 @@ var async = require('async'),
 function CmdRunner(datasrc) {
   this.cmds = [];
   this.datasrc = datasrc;
+  this.pageFn = pagination.pageFn;
+  this.stopFn = pagination.stopFn;
   this.context = {};
-};
+}
 
 /**
  * @param {Function} User function which can create context data using "this".
  */
-CmdRunner.prototype.createContext = function createContext(func) {
-  if (typeof func !== 'function') {
+CmdRunner.prototype.createContext = function createContext(fn) {
+  if (typeof fn !== 'function') {
     throw new Error('First argument must be a function');
   }
-  return func.call(this.context);
+  return fn.call(this.context);
+};
+
+/**
+ * @param {Array} Array of Cmds
+ */
+function validateCmds(cmds) {
+  if (!Array.isArray(cmds)) {
+    throw new Error('First argument must be an array');
+  } else if (cmds.length === 0) {
+    return next(null, []);
+  } else if (cmds[0].getName() !== 'GetCmd') {
+    throw new Error('First Cmd must be a GetCmd');
+  }
+  cmds.forEach(function(cmd, index) {
+    if (!cmd instanceof Cmd) {
+      throw new Error('Object at position %d is not a Cmd', index);
+    }
+  });
+}
+
+/**
+ * Runs a single iteration of commands in a repeatable fashion.
+ * @param {Function} Callback
+ */
+CmdRunner.prototype._runPages = function _runPages(next) {
+  var self = this;
+  this.context.step = 0;
+  // Run Cmds one by one.
+  async.series(this.cmds.map(function(cmd) {
+    if (cmd.setDatasrc) cmd.setDatasrc(self.datasrc);
+    if (cmd.setPageFn) cmd.setPageFn(self.pageFn);
+    self.context.step++;
+    cmd.setContext(self.context);
+    debug('Starting iteration %d', self.context.step);
+    return async.apply(cmd.exec.bind(cmd));
+  }), next);
 };
 
 /**
@@ -33,37 +73,38 @@ CmdRunner.prototype.createContext = function createContext(func) {
  */
 CmdRunner.prototype.run = function run(cmds, next) {
   var self = this;
+  validateCmds(cmds);
   this.cmds = cmds;
-  if (!Array.isArray(cmds)) {
-    throw new Error('First argument must be an array');
-  } else if (cmds.length === 0) {
-    return next(null, []);
-  } else if (!isCmds(cmds)) {
-    throw new Error('First argument must be an array of Cmd objects');
-  } else if (cmds[0].getName() !== 'GetCmd') {
-    throw new Error('First Cmd must be a GetCmd');
-  }
-  listCmds(self.cmds);
-  self.context.step = 0;
-  // Run Cmds one by one.
-  async.waterfall(this.cmds.map(function(cmd) {
-    if (cmd.setDatasrc) cmd.setDatasrc(self.datasrc);
-    self.context.step++;
-    cmd.setContext(self.context);
-    return async.apply(cmd.exec.bind(cmd));
-  }), function(err, sums) {
-    return next(err, sums);
+  listCmds(this.cmds);
+  async.doWhilst(this._runPages.bind(self), function() {
+    return self.stopFn.call(self.context, self.context.data);
+  }, function(err) {
+    return next(err, self.context.data.content);
   });
 };
 
 /**
- * @param {Array} Array of Cmds
- * @return {Boolean} True if array contains all-Cmds, False otherwise
+ * Adds pagination to the command chain execution.
+ * Two functions are required;
+ * one that delivers the HTTP/GET query params required for fetching the next
+ * page, and another that returns True if the next page should be loaded, and
+ * False if page loading should stop.
+ * @param {Function} Pagination function
+ * @param {Function} Stop function
  */
-function isCmds(cmds) {
-  return Array.prototype.every.call(cmds, function(cmd) {
-    return cmd instanceof Cmd;
-  });
+CmdRunner.prototype.paginate = function paginate(pageFn, stopFn) {
+  if (pageFn === null && stopFn === null) {
+    // Treat the absence of arguments as a reset to default.
+    this.pageFn = pagination.pageFn;
+    this.stopFn = pagination.stopFn;
+  } else if (typeof pageFn !== 'function') {
+    throw new Error('First argument must be a function');
+  } else if (typeof stopFn !== 'function') {
+    throw new Error('Second argument must be a function');
+  } else {
+    this.pageFn = pageFn;
+    this.stopFn = stopFn;
+  }
 };
 
 /**
@@ -76,7 +117,7 @@ function listCmds(cmds) {
     return names.push(cmd.getName());
   });
   console.log(names.join(' -> '));
-};
+}
 
 // Export the constructor.
 module.exports = CmdRunner;

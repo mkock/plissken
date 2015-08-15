@@ -36,13 +36,27 @@ GetCmd.prototype.setDatasrc = function setDatasrc(datasrc) {
   this.datasrc = datasrc;
 };
 
+/**
+ * Sets the function used for retrieving paginated results.
+ * @param {Function} Pagination function
+ */
+GetCmd.prototype.setPageFn = function setPageFn(pageFn) {
+  this.pageFn = pageFn;
+};
+
 /*
  * @return {Object}
  */
 GetCmd.prototype.exec = function exec(next) {
-  var self = this;
-  return this.datasrc.get({url: this.relUrl}, function(err, res) {
-    return self.acceptFunc.call(self.context, err, res, next); // Invoke handler function.
+  var self = this,
+    opts = extend({url: this.relUrl}, this.pageFn());
+  return this.datasrc.get(opts, function(err, res) {
+    self.context.data = res;
+    return self.acceptFunc.call(self.context.data, err, res, function(err, data) {
+      if (err) return next(err);
+      self.context.data = data;
+      return next();
+    });
   });
 };
 

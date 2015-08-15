@@ -37,7 +37,20 @@ Cmd.prototype.getName = function getName() {
  * @param {Object} Cmd context (injected by CmdRunner)
  */
 Cmd.prototype.setContext = function setContex(context) {
-  this.context = extend(this.context, context);
+  this.context = context;
+  this.context.cmdName = this.name;
+};
+
+/**
+ * Filters given elems by removing empty values (null, undefined, etc).
+ * @param {Array} List of elements
+ * @param {Function} Callback
+ */
+Cmd.prototype.clean = function clean(content, next) {
+  if (Array.isArray(content) && content.length) {
+    content = content.filter(Boolean);
+  }
+  return next(null, content);
 };
 
 // Export the constructor.

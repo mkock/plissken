@@ -6,6 +6,7 @@
 'use strict';
 
 var util = require('util'),
+  async = require('async'),
   Cmd = require('./../cmd/Cmd');
 
 /**
@@ -26,8 +27,12 @@ FilterCmd.prototype.constructor = FilterCmd;
 /*
  * @return {Object}
  */
-FilterCmd.prototype.exec = function exec(elems, next) {
-  return next(null, Array.prototype.filter.call(elems, this.filterFunc));
+FilterCmd.prototype.exec = function exec(next) {
+  var self = this;
+  async.filter(this.context.data.content, this.filterFunc.bind(this.context), function(content) {
+    self.context.data.content = content;
+    return next();
+  });
 };
 
 // Export the constructor.
