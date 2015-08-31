@@ -17,13 +17,12 @@ var debug = require('debug')('plissken:CmdRunner'),
 function CmdRunner(datasrc) {
   this.cmds = [];
   this.datasrc = datasrc;
-  this.pageFn = pagination.pageFn;
-  this.stopFn = pagination.stopFn;
+  this.pageFn = pagination;
   this.context = {};
 }
 
 /**
- * @param {Function} User function which can create context data using "this".
+ * @param {Function} User function which can create context data using "this"
  */
 CmdRunner.prototype.newContext = function newContext(fn) {
   if (typeof fn !== 'function') {
@@ -51,7 +50,7 @@ function validateCmds(cmds) {
 }
 
 /**
- * Runs a single iteration of commands in a repeatable fashion.
+ * Runs a single iteration of commands in a repeatable fashion
  * @param {Function} Callback
  */
 CmdRunner.prototype._runPages = function _runPages(next) {
@@ -67,55 +66,64 @@ CmdRunner.prototype._runPages = function _runPages(next) {
       debug('Running %s', cmd.getName());
       return cmd.exec.call(cmd, aNext);
     });
-  }), next);
+  }), function(err, res) {
+    // Push all elems onto a queue.
+    if (!err) {
+      self.context.all.push(self.context.data.content);
+    }
+    return next(err);
+  });
 };
 
 /**
- * Runs the given array of commands in order and returns the results.
+ * @return {Boolean} True if GetCmd has marked that it's done, False otherwise
+ * @private
+ */
+CmdRunner.prototype._isNotDone = function _isNotDone() {
+  return !this.context._done;
+};
+
+/**
+ * Runs the given array of commands in order and returns the results
+ * @param {Array} List of Cmds
+ * @param {Function} Callback(err, res) where "res" is an array that contains
+ *   a nested array per iteration (corresponds to the number of pages processed)
  * @public
  */
 CmdRunner.prototype.run = function run(cmds, next) {
   var self = this,
     start = new Date(),
     end;
+  this.context.all = [];
   validateCmds(cmds);
   this.cmds = cmds;
   listCmds(this.cmds);
-  async.doWhilst(this._runPages.bind(self), function() {
-    return self.stopFn.call(self.context, self.context.data);
-  }, function(err) {
+  // Stop condition is an Error with name = 'EndOfDataError'.
+  async.doWhilst(this._runPages.bind(self), this._isNotDone.bind(self), function(err) {
     end = new Date();
     debug('Finished in %d seconds', date.difference(start, end, 'seconds'));
-    return next(err, self.context.data.content);
+    return next(
+      (err instanceof Error && err.name === 'EndOfDataError' ? null : err),
+      self.context.all
+    );
   });
 };
 
 /**
  * Adds pagination to the command chain execution.
- * Two functions are required;
- * one that delivers the HTTP/GET query params required for fetching the next
- * page, and another that returns True if the next page should be loaded, and
- * False if page loading should stop.
+ * A single function is required, which delivers the HTTP/GET query params
+ * required for fetching the next page.
  * @param {Function} Pagination function
- * @param {Function} Stop function
  */
-CmdRunner.prototype.paginate = function paginate(pageFn, stopFn) {
-  if (pageFn === null && stopFn === null) {
-    // Treat the absence of arguments as a reset to default.
-    this.pageFn = pagination.pageFn;
-    this.stopFn = pagination.stopFn;
-  } else if (typeof pageFn !== 'function') {
-    throw new Error('First argument must be a function');
-  } else if (typeof stopFn !== 'function') {
-    throw new Error('Second argument must be a function');
-  } else {
-    this.pageFn = pageFn;
-    this.stopFn = stopFn;
+CmdRunner.prototype.paginate = function paginate(pageFn) {
+  this.pageFn = pagination.pageFn || pageFn;
+  if (typeof pageFn !== 'function') {
+    throw new Error('Argument must be a function');
   }
 };
 
 /**
- * Prints the Cmd names in order.
+ * Prints the Cmd names in order
  * @param {Array} Array of Cmds
  */
 function listCmds(cmds) {

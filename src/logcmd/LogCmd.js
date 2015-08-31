@@ -6,13 +6,18 @@
 'use strict';
 
 var util = require('util'),
-  Cmd = require('./../cmd/Cmd');
+  Cmd = require('./../cmd/Cmd'),
+  stdout = require('./stdout');
 
 /**
  * @constructor
  */
-function LogCmd() {
+function LogCmd(logFn) {
   Cmd.call(this, 'LogCmd');
+  this.logFn = logFn || stdout; // Fallback is stdout.
+  if (typeof this.logFn !== 'function') {
+    throw new Error('Argument is not a function');
+  }
 };
 
 // Inherit from Cmd.
@@ -23,8 +28,9 @@ LogCmd.prototype.constructor = LogCmd;
  * @return {Object}
  */
 LogCmd.prototype.exec = function exec(next) {
+  var self = this;
   Array.prototype.forEach.call(this.context.data.content, function(elem) {
-    console.log(elem);
+    return self.logFn.call(self.context.data, elem);
   });
   return next();
 };

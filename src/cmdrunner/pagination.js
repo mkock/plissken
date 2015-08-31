@@ -8,14 +8,6 @@
 /*
  * Default pagination functions for CmdRunner. 
  */
-module.exports = (function() {
-  var empty = {};
-  return {
-    pageFn: function() {
-      return empty;
-    },
-    stopFn: function(payload) {
-      return false;
-    }
-  };
-})();
+module.exports = function(opts) {
+  return false; // No pagination.
+}

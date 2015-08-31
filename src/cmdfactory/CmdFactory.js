@@ -9,7 +9,8 @@ var util = require('util'),
   GetCmd = require('./../getcmd/GetCmd'),
   LogCmd = require('./../logcmd/LogCmd'),
   FilterCmd = require('./../filtercmd/FilterCmd'),
-  SelectCmd = require('./../selectcmd/SelectCmd');
+  SelectCmd = require('./../selectcmd/SelectCmd'),
+  SaveCmd = require('./../savecmd/SaveCmd');
 
 /**
  * Factory is a singleton pattern.
@@ -27,23 +28,30 @@ module.exports = (function() {
     /**
      * @return {Object} LogCmd
      */
-    newLogCmd: function() {
-      return new LogCmd();
+    newLogCmd: function(logFn) {
+      return new LogCmd(logFn);
     },
 
     /**
      * @return {Object} FilterCmd
      */
-    newFilterCmd: function(filterFunc) {
-      return new FilterCmd(filterFunc);
+    newFilterCmd: function(filterFn) {
+      return new FilterCmd(filterFn);
     },
 
     /**
      * @return {Object} SelectCmd
      */
-    newSelectCmd: function(selectFunc) {
-      return new SelectCmd(selectFunc);
+    newSelectCmd: function(selectFn) {
+      return new SelectCmd(selectFn);
     },
+
+    /**
+     * @return {Object} SaveCmd
+     */
+    newSaveCmd: function(saveFn) {
+      return new SaveCmd(saveFn);
+    }
 
   };
 })();

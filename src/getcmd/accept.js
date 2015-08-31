@@ -27,7 +27,7 @@ function toJSON(res, body, next) {
  *
  * @param {Error} Error, if any
  * @param {Object} HTTP response
- * @param {Function} Callback
+ * @param {Function} Callback; receives False on EOF
  */
 module.exports = function(err, res, next) {
   if (err) return next(err);
@@ -38,6 +38,6 @@ module.exports = function(err, res, next) {
       return next(null, res);
     });
   } else {
-    return next(new Error('HTTP/%d - %s', res.response.statusCode, res.content));
+    return next(null, false);
   }
 };

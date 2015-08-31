@@ -49,7 +49,7 @@ function toErr(res, body) {
  * @param {Function} Next
  */
 Datasrc.prototype.get = function get(opts, next) {
-  this.opt = makeOpts(this.opts, opts);
+  this.opts = makeOpts(this.opts, opts);
   debug('GET %s', this.opts.baseUrl + this.opts.url);
   return request(this.opts, function(err, res, body) {
     return next(err, {request: opts, response: res, content: body});

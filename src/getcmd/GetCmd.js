@@ -15,13 +15,13 @@ var extend = require('extend'),
  * @param {Function} Optional function for accepting/rejecting GET response
  * @param {Object} Optional extra options
  */
-function GetCmd(relUrl, acceptFunc, opts) {
-  if (acceptFunc && typeof acceptFunc !== 'function') {
+function GetCmd(relUrl, acceptFn, opts) {
+  if (acceptFn && typeof acceptFn !== 'function') {
     throw new Error('Second argument must be a function');
   }
   Cmd.call(this, 'GetCmd');
   this.relUrl = relUrl;
-  this.acceptFunc = acceptFunc || accept;
+  this.acceptFn = acceptFn || accept;
   this.opts = opts || {};
 };
 
@@ -49,11 +49,24 @@ GetCmd.prototype.setPageFn = function setPageFn(pageFn) {
  */
 GetCmd.prototype.exec = function exec(next) {
   var self = this,
-    opts = extend({url: this.relUrl}, this.pageFn());
-  return this.datasrc.get(opts, function(err, res) {
+    initOpts = {url: this.relUrl},
+    currOpts = this.pageFn(initOpts),
+    onePage = typeof currOpts === 'boolean' && !currOpts;
+  // Reassign opts based on the "onePage" var.
+  currOpts = onePage ? initOpts : extend(initOpts, currOpts);
+  // Carry out the actual HTTP(S) request.
+  return this.datasrc.get(currOpts, function(err, res) {
     self.context.data = res;
-    return self.acceptFunc.call(self.context.data, err, res, function(err, data) {
-      if (err) return next(err);
+    return self.acceptFn.call(self.context.data, err, res, function(err, data) {
+      var eofErr;
+      if (err) {
+        return next(err);
+      } else if (!onePage && typeof data === 'boolean' && !data) {
+        eofErr = new Error('No more data available');
+        eofErr.name = 'EndOfDataError';
+        return next(eofErr, null);
+      }
+      self.context._done = onePage;
       self.context.data = data;
       return next();
     });
