@@ -24,6 +24,8 @@ SelectCmd.prototype = Object.create(Cmd.prototype);
 SelectCmd.prototype.constructor = SelectCmd;
 
 /*
+ * Executes this Cmd
+ * @oaram {Function} Callback(err)
  * @return {Object}
  */
 SelectCmd.prototype.exec = function exec(next) {

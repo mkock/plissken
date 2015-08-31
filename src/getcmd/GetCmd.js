@@ -37,7 +37,7 @@ GetCmd.prototype.setDatasrc = function setDatasrc(datasrc) {
 };
 
 /**
- * Sets the function used for retrieving paginated results.
+ * Sets the function used for retrieving paginated results
  * @param {Function} Pagination function
  */
 GetCmd.prototype.setPageFn = function setPageFn(pageFn) {
@@ -45,6 +45,8 @@ GetCmd.prototype.setPageFn = function setPageFn(pageFn) {
 };
 
 /*
+ * Executes this Cmd
+ * @param {Function} next(err) Callback
  * @return {Object}
  */
 GetCmd.prototype.exec = function exec(next) {

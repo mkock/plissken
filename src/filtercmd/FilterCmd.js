@@ -11,25 +11,27 @@ var util = require('util'),
 
 /**
  * @constructor
+ * @param {Function} filterFn(elem, next) Filter function
  */
-function FilterCmd(filterFunc) {
-  if (typeof filterFunc !== 'function') {
+function FilterCmd(filterFn) {
+  if (typeof filterFn !== 'function') {
     throw new Error('First argument must be a function');
   }
   Cmd.call(this, 'FilterCmd');
-  this.filterFunc = filterFunc;
+  this.filterFn = filterFn;
 };
 
 // Inherit from Cmd.
 FilterCmd.prototype = Object.create(Cmd.prototype);
 FilterCmd.prototype.constructor = FilterCmd;
 
-/*
- * @return {Object}
+/**
+ * Executes this Cmd
+ * @param {Function} next(err) Callback
  */
 FilterCmd.prototype.exec = function exec(next) {
   var self = this;
-  async.filter(this.context.data.content, this.filterFunc.bind(this.context), function(content) {
+  async.filter(this.context.data.content, this.filterFn.bind(this.context), function(content) {
     self.context.data.content = content;
     return next();
   });

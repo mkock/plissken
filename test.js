@@ -27,7 +27,7 @@ var plissken = require('./index');
     });
   runner.run([getCmd, logCmd, selectCmd, logCmd, filterCmd, logCmd], function(err, data) {
     console.log(err, data);
-  });  
+  });
 })();
 
 (function testMovies() {
@@ -57,5 +57,5 @@ var plissken = require('./index');
     });
   runner.run([getCmd, logCmd, selectCmd, logCmd, filterCmd, logCmd], function(err, data) {
     console.log(err, data);
-  });  
+  });
 })();

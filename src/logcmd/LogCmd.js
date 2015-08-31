@@ -11,6 +11,7 @@ var util = require('util'),
 
 /**
  * @constructor
+ * @param {Function} logFn(elem) Optional custom log function
  */
 function LogCmd(logFn) {
   Cmd.call(this, 'LogCmd');
@@ -25,6 +26,8 @@ LogCmd.prototype = Object.create(Cmd.prototype);
 LogCmd.prototype.constructor = LogCmd;
 
 /*
+ * Executes this Cmd
+ * @param {Function} next(err) Callback
  * @return {Object}
  */
 LogCmd.prototype.exec = function exec(next) {

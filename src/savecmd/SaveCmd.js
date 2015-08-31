@@ -23,8 +23,9 @@ function SaveCmd(saveFn) {
 SaveCmd.prototype = Object.create(Cmd.prototype);
 SaveCmd.prototype.constructor = SaveCmd;
 
-/*
- * @return {Object}
+/**
+ * Executes this Cmd
+ * @param {Function} next(err) Callback
  */
 SaveCmd.prototype.exec = function exec(next) {
   var self = this;
