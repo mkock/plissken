@@ -46,6 +46,9 @@ var plissken = require('./index');
     filterCmd = plissken.CmdFactory.newFilterCmd(function(movie, next) {
       return next(movie.year <= 2000);
     }),
+    saveCmd = plissken.CmdFactory.newSaveCmd(function(movie) {
+      console.log('Saving movie ' + movie.title + '...');
+    }),
     runner = plissken.newCmdRunner(mock);
     runner.newContext(function() {
       this.elems = [];
@@ -55,7 +58,7 @@ var plissken = require('./index');
       opts.url = opts.url + '/' + (++page);
       return opts;
     });
-  runner.run([getCmd, logCmd, selectCmd, logCmd, filterCmd, logCmd], function(err, data) {
+  runner.run([getCmd, logCmd, selectCmd, logCmd, filterCmd, logCmd, saveCmd], function(err, data) {
     console.log(err, data);
   });
 })();

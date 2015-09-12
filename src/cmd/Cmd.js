@@ -33,7 +33,7 @@ Cmd.prototype.getName = function getName() {
 };
 
 /**
- * Sets the Cmd context.
+ * Sets the Cmd context
  * @param {Object} Cmd context (injected by CmdRunner)
  */
 Cmd.prototype.setContext = function setContex(context) {
@@ -42,7 +42,15 @@ Cmd.prototype.setContext = function setContex(context) {
 };
 
 /**
- * Filters given elems by removing empty values (null, undefined, etc).
+ * Returns the Cmd context
+ * @return {Object} Context
+ */
+Cmd.prototype.getContext = function getContext() {
+  return this.context;
+};
+
+/**
+ * Filters given elems by removing empty values (null, undefined, etc)
  * @param {Array} List of elements
  * @param {Function} Callback
  */
