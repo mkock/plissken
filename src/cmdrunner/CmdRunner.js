@@ -32,6 +32,14 @@ CmdRunner.prototype.newContext = function newContext(fn) {
 };
 
 /**
+ * Returns the context for this CmdRunner
+ * @return {Object} Context
+ */
+CmdRunner.prototype.getContext = function getContext() {
+  return this.context;
+};
+
+/**
  * @param {Array} Array of Cmds
  */
 function validateCmds(cmds) {

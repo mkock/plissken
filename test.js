@@ -46,6 +46,16 @@ var plissken = require('./index');
     filterCmd = plissken.CmdFactory.newFilterCmd(function(movie, next) {
       return next(movie.year <= 2000);
     }),
+    extendCmd = plissken.CmdFactory.newExtendCmd(function(movie, opts) {
+      opts.url = 'movies/' + movie.id;
+      return opts;
+    }, function(movie, response, next) {
+      // TODO: This method of passing the entire response is not ideal.
+      console.log('Extending movie ' + movie.id + '...');
+      movie.genres = response.content.genres;
+      movie.runtime = response.content.runtime;
+      return next(null, movie);
+    }),
     saveCmd = plissken.CmdFactory.newSaveCmd(function(movie) {
       console.log('Saving movie ' + movie.title + '...');
     }),
@@ -55,10 +65,10 @@ var plissken = require('./index');
     });
     var page = 0;
     runner.paginate(function(opts) {
-      opts.url = opts.url + '/' + (++page);
+      opts.url = opts.url + '/page/' + (++page);
       return opts;
     });
-  runner.run([getCmd, logCmd, selectCmd, logCmd, filterCmd, logCmd, saveCmd], function(err, data) {
-    console.log(err, data);
+  runner.run([getCmd, logCmd, selectCmd, logCmd, filterCmd, logCmd, extendCmd, logCmd, saveCmd], function(err, data) {
+    console.log(err, data, runner.getContext());
   });
 })();
