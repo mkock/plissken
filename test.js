@@ -49,11 +49,10 @@ var plissken = require('./index');
     extendCmd = plissken.CmdFactory.newExtendCmd(function(movie, opts) {
       opts.url = 'movies/' + movie.id;
       return opts;
-    }, function(movie, response, next) {
-      // TODO: This method of passing the entire response is not ideal.
+    }, function(movie, xMovie, response, next) {
       console.log('Extending movie ' + movie.id + '...');
-      movie.genres = response.content.genres;
-      movie.runtime = response.content.runtime;
+      movie.genres = xMovie.genres;
+      movie.runtime = xMovie.runtime;
       return next(null, movie);
     }),
     saveCmd = plissken.CmdFactory.newSaveCmd(function(movie) {

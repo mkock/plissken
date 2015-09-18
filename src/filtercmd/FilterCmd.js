@@ -31,8 +31,8 @@ FilterCmd.prototype.constructor = FilterCmd;
  */
 FilterCmd.prototype.exec = function exec(next) {
   var self = this;
-  async.filter(this.context.data.content, this.filterFn.bind(this.context), function(content) {
-    self.context.data.content = content;
+  async.filter(this.context.__elems, this.filterFn.bind(this.context), function(elems) {
+    self.context.__elems = elems;
     return next();
   });
 };

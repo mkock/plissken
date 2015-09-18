@@ -30,11 +30,11 @@ SelectCmd.prototype.constructor = SelectCmd;
  */
 SelectCmd.prototype.exec = function exec(next) {
   var self = this;
-  self.selectFunc.call(self.context, self.context.data.content, function(err, content) {
+  self.selectFunc.call(self.context, self.context.__elems, function(err, elems) {
     if (err) return next(err);
-    self.context.data.content = content;
-    return self.clean(self.context.data.content, function(err, content) {
-      if (!err) self.context.data.content = content;
+    self.context.__elems = elems;
+    return self.clean(self.context.__elems, function(err, elems) {
+      if (!err) self.context.__elems = elems;
       return next(err);
     });
   });

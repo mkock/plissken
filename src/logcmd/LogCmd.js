@@ -32,8 +32,8 @@ LogCmd.prototype.constructor = LogCmd;
  */
 LogCmd.prototype.exec = function exec(next) {
   var self = this;
-  Array.prototype.forEach.call(this.context.data.content, function(elem) {
-    return self.logFn.call(self.context.data, elem);
+  Array.prototype.forEach.call(this.context.__elems, function(elem) {
+    return self.logFn.call(self.context, elem);
   });
   return next();
 };

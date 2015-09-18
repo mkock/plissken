@@ -9,6 +9,7 @@ var debug = require('debug')('plissken:CmdRunner'),
   date = require('date-extended'),
   async = require('async'),
   Cmd = require('./../cmd/Cmd'),
+  Context = require('./Context'),
   pagination = require('./pagination');
 
 /**
@@ -18,7 +19,7 @@ function CmdRunner(datasrc) {
   this.cmds = [];
   this.datasrc = datasrc;
   this.pageFn = pagination;
-  this.context = {};
+  this.context = new Context();
 }
 
 /**
@@ -72,14 +73,20 @@ CmdRunner.prototype._runPages = function _runPages(next) {
       self.context.step++;
       cmd.setContext(self.context);
       debug('Running %s', cmd.getName());
-      return cmd.exec.call(cmd, aNext);
+      return cmd.exec.call(cmd, function(err, __) {
+        self.context.cleanOne();
+        return aNext(err, cmd.getName());
+      });
     });
-  }), function(err, res) {
-    // Push all elems onto a queue.
-    if (!err) {
-      self.context.all.push(self.context.data.content);
+  }), function(err, cmds) {
+    if (err) return next(err);
+    // Push all elems onto a list in order.
+    if (Array.isArray(self.context.__elems) && self.context.__elems.length) {
+      self.context.__elems.forEach(function(elem) {
+        self.context.elems.push(elem);
+      });
     }
-    return next(err);
+    return next();
   });
 };
 
@@ -88,7 +95,7 @@ CmdRunner.prototype._runPages = function _runPages(next) {
  * @private
  */
 CmdRunner.prototype._isNotDone = function _isNotDone() {
-  return !this.context._done;
+  return !this.context.__done;
 };
 
 /**
@@ -102,17 +109,17 @@ CmdRunner.prototype.run = function run(cmds, next) {
   var self = this,
     start = new Date(),
     end;
-  this.context.all = [];
   validateCmds(cmds);
   this.cmds = cmds;
   listCmds(this.cmds);
   // Stop condition is an Error with name = 'EndOfDataError'.
   async.doWhilst(this._runPages.bind(self), this._isNotDone.bind(self), function(err) {
+    self.context.cleanTwo();
     end = new Date();
     debug('Finished in %d seconds', date.difference(start, end, 'seconds'));
     return next(
       (err instanceof Error && err.name === 'EndOfDataError' ? null : err),
-      self.context.all
+      self.context.elems
     );
   });
 };

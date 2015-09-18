@@ -34,8 +34,7 @@ module.exports = function(err, res, next) {
   if (res.response.statusCode === 200) {
     return toJSON(res.response, res.content, function(err, content) {
       if (err) return next(err);
-      res.content = content;
-      return next(null, res);
+      return next(null, content);
     });
   } else {
     return next(null, false);

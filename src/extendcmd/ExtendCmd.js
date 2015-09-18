@@ -42,12 +42,11 @@ ExtendCmd.prototype._get = function _get(opts, next) {
   var self = this;
   // Carry out the actual HTTP(S) request.
   return this.datasrc.get(opts, function(err, res) {
-    self.context.data = res;
-    return self.acceptFn.call(self.context.data, err, res, function(err, data) {
+    return self.acceptFn.call(self.context, err, res, function(err, elem) {
       if (err) {
         return next(err);
       }
-      return next(null, data);
+      return next(null, res, elem);
     });
   });
 };
@@ -55,28 +54,27 @@ ExtendCmd.prototype._get = function _get(opts, next) {
 /*
  * Executes this Cmd
  * @param {Function} next(err) Callback
- * @return {Object}
  */
 ExtendCmd.prototype.exec = function exec(next) {
-  // 1. Iterate movies
+  // 1. Iterate elems
   // 2. Call urlFn to get URL
   // 3. Make request
   // 4. Check with acceptFn
-  // 5. Feed movie and response into extendFn
+  // 5. Feed elem and response (xElem) into extendFn
   // 6. Store results
   var self = this;
-  async.map(this.context.data.content, function(elem, aNext) {
-    var opts = self.urlFn.call(self.context.data, elem, {});
+  return async.map(this.context.__elems, function(elem, aNext) {
+    var opts = self.urlFn.call(self.context, elem, {});
     if (!opts || typeof opts !== 'object' || !opts.url) {
       return aNext(new Error('"urlFn" must provide a relative URL to request'));
     }
-    return self._get(opts, function(err, xElem) {
+    return self._get(opts, function(err, res, xElem) {
       if (err) return aNext(err);
-      return self.extendFn.call(self.context.data, elem, xElem, aNext);
+      return self.extendFn.call(self.context, elem, xElem, res, aNext);
     });
-  }, function(err, res) {
+  }, function(err, elems) {
     // Replace elems by their extended counterparts.
-    self.context.data.content = res;
+    self.context.__elems = elems;
     return next();
   });
 };

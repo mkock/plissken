@@ -17,9 +17,7 @@ function Cmd(name) {
     throw new Error('Cmd name must be a string');
   }
   this.name = name;
-  this.context = {
-    cmdName: name
-  };
+  this.context = null;
 };
 
 // Let's use event emitters.
@@ -38,7 +36,7 @@ Cmd.prototype.getName = function getName() {
  */
 Cmd.prototype.setContext = function setContex(context) {
   this.context = context;
-  this.context.cmdName = this.name;
+  this.context._cmdName = this.name;
 };
 
 /**
@@ -54,11 +52,11 @@ Cmd.prototype.getContext = function getContext() {
  * @param {Array} List of elements
  * @param {Function} Callback
  */
-Cmd.prototype.clean = function clean(content, next) {
-  if (Array.isArray(content) && content.length) {
-    content = content.filter(Boolean);
+Cmd.prototype.clean = function clean(elems, next) {
+  if (Array.isArray(elems) && elems.length) {
+    elems = elems.filter(Boolean);
   }
-  return next(null, content);
+  return next(null, elems);
 };
 
 // Export the constructor.
