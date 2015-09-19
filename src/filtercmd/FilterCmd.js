@@ -19,7 +19,7 @@ function FilterCmd(filterFn) {
   }
   Cmd.call(this, 'FilterCmd');
   this.filterFn = filterFn;
-};
+}
 
 // Inherit from Cmd.
 FilterCmd.prototype = Object.create(Cmd.prototype);

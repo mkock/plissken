@@ -11,8 +11,8 @@ var Datasrc = require('./src/datasrc/Datasrc'),
 
 module.exports = {
 
-  newDataSrc: function(opts) {
-    return new Datasrc(opts);
+  newDataSrc: function(opts, retryOpts) {
+    return new Datasrc(opts, retryOpts);
   },
 
   newCmdRunner: function(datasrc) {

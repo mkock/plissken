@@ -64,13 +64,13 @@ function validateCmds(cmds) {
  */
 CmdRunner.prototype._runPages = function _runPages(next) {
   var self = this;
-  this.context.step = 0;
+  this.context.__step = 0;
   // Run Cmds one by one.
   async.series(this.cmds.map(function(cmd) {
     return async.apply(function iteration(aNext) {
       if (cmd.setDatasrc) cmd.setDatasrc(self.datasrc);
       if (cmd.setPageFn) cmd.setPageFn(self.pageFn);
-      self.context.step++;
+      self.context.__step++;
       cmd.setContext(self.context);
       debug('Running %s', cmd.getName());
       return cmd.exec.call(cmd, function(err, __) {

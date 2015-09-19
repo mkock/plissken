@@ -17,15 +17,15 @@ function SelectCmd(selectFunc) {
   }
   Cmd.call(this, 'SelectCmd');
   this.selectFunc = selectFunc;
-};
+}
 
 // Inherit from Cmd.
 SelectCmd.prototype = Object.create(Cmd.prototype);
 SelectCmd.prototype.constructor = SelectCmd;
 
-/*
+/**
  * Executes this Cmd
- * @oaram {Function} Callback(err)
+ * @param {Function} Callback(err)
  * @return {Object}
  */
 SelectCmd.prototype.exec = function exec(next) {

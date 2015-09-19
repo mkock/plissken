@@ -23,13 +23,14 @@ function GetCmd(relUrl, acceptFn, opts) {
   this.relUrl = relUrl;
   this.acceptFn = acceptFn || accept;
   this.opts = opts || {};
-};
+}
 
 // Inherit from Cmd.
 GetCmd.prototype = Object.create(Cmd.prototype);
 GetCmd.prototype.constructor = GetCmd;
 
 /**
+ * Sets the data source
  * @param {Object} Data source
  */
 GetCmd.prototype.setDatasrc = function setDatasrc(datasrc) {

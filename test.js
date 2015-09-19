@@ -23,7 +23,6 @@ var plissken = require('./index');
     }),
     runner = plissken.newCmdRunner(mock);
     runner.newContext(function() {
-      this.elems = [];
     });
   runner.run([getCmd, logCmd, selectCmd, logCmd, filterCmd, logCmd], function(err, data) {
     console.log(err, data);
@@ -60,7 +59,7 @@ var plissken = require('./index');
     }),
     runner = plissken.newCmdRunner(mock);
     runner.newContext(function() {
-      this.elems = [];
+      this.doneMsg = 'Done!';
     });
     var page = 0;
     runner.paginate(function(opts) {

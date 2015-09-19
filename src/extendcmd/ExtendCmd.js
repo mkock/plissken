@@ -22,7 +22,7 @@ function ExtendCmd(urlFn, acceptFn, extendFn, opts) {
   this.acceptFn = acceptFn || accept;
   this.extendFn = extendFn;
   this.opts = opts || {};
-};
+}
 
 // Inherit from Cmd.
 ExtendCmd.prototype = Object.create(Cmd.prototype);
