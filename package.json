@@ -18,11 +18,11 @@
   "license": "MIT",
   "repository": "mkock/plissken",
   "dependencies": {
-    "async": "^1.4.0",
+    "async": "^1.4.2",
     "date-extended": "0.0.6",
     "debug": "^2.2.0",
     "extend": "^3.0.0",
-    "request": "^2.60.0",
+    "request": "^2.64.0",
     "retry": "^0.8.0",
     "xml2json": "^0.8.2"
   },
