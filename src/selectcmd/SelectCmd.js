@@ -33,10 +33,7 @@ SelectCmd.prototype.exec = function exec(next) {
   self.selectFunc.call(self.context, self.context.__elems, function(err, elems) {
     if (err) return next(err);
     self.context.__elems = elems;
-    return self.clean(self.context.__elems, function(err, elems) {
-      if (!err) self.context.__elems = elems;
-      return next(err);
-    });
+    return next(err);
   });
 };
 

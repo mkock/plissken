@@ -47,17 +47,5 @@ Cmd.prototype.getContext = function getContext() {
   return this.context;
 };
 
-/**
- * Filters given elems by removing empty values (null, undefined, etc)
- * @param {Array} List of elements
- * @param {Function} Callback
- */
-Cmd.prototype.clean = function clean(elems, next) {
-  if (Array.isArray(elems) && elems.length) {
-    elems = elems.filter(Boolean);
-  }
-  return next(null, elems);
-};
-
 // Export the constructor.
 module.exports = Cmd;

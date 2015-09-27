@@ -57,6 +57,24 @@ describe('Plissken CmdRunner Test Suite', function() {
       expect(context.four).toBeDefined();
     });
 
+    it('removes empty elements from global list', function() {
+      var context = new Context();
+      context.elems = [
+        1, 2, 3, 4, undefined, false, 5, 6, 7, null, 8, 9.0, '10'
+      ];
+      context.rmEmptyElems();
+      expect(context.elems).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9.0, '10']);
+    });
+
+    it('removes empty elements from local list', function() {
+      var context = new Context();
+      context.__elems = [
+        1, 2, 3, 4, undefined, false, 5, 6, 7, null, 8, 9.0, '10'
+      ];
+      context.rmEmptyElems();
+      expect(context.__elems).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9.0, '10']);
+    });
+
   });
 
   /**

@@ -23,6 +23,28 @@ function CmdRunner(datasrc) {
 }
 
 /**
+ * Returns time passed in a human readable format
+ * @param {Object} Date representing start time
+ * @param {Object} Date representing end time
+ * @return {String} Human readable time
+ */
+function humanTime(start, end) {
+  var secs = date.difference(start, end, 'seconds'),
+    mins, hours;
+  if (secs < 60) {
+    return secs + (secs === 1 ? ' second' : ' seconds');
+  } else {
+    mins = date.difference(start, end, 'minutes');
+    if (mins < 60) {
+      return mins + (mins === 1 ? ' minute' : ' minutes');
+    } else {
+      hours = date.difference(start, end, 'hours');
+      return hours + (hours === 1 ? ' hour' : ' hours');
+    }
+  }
+}
+
+/**
  * @param {Function} User function which can create context data using "this"
  */
 CmdRunner.prototype.newContext = function newContext(fn) {
@@ -74,6 +96,7 @@ CmdRunner.prototype._runPages = function _runPages(next) {
       cmd.setContext(self.context);
       debug('Running %s', cmd.getName());
       return cmd.exec.call(cmd, function(err, __) {
+        self.context.rmEmptyElems();
         self.context.cleanOne();
         return aNext(err, cmd.getName());
       });
@@ -116,7 +139,7 @@ CmdRunner.prototype.run = function run(cmds, next) {
   async.doWhilst(this._runPages.bind(self), this._isNotDone.bind(self), function(err) {
     self.context.cleanTwo();
     end = new Date();
-    debug('Finished in %d seconds', date.difference(start, end, 'seconds'));
+    debug('Finished in %s', humanTime(start, end));
     return next(
       (err instanceof Error && err.name === 'EndOfDataError' ? null : err),
       self.context.elems

@@ -33,11 +33,7 @@ var plissken = require('./index');
   var mock = plissken.newDataSrc({baseUrl: 'http://localhost:3000/'});
   var getCmd = plissken.CmdFactory.newGetCmd('movies'),
     selectCmd = plissken.CmdFactory.newSelectCmd(function(data, next) {
-      var movies = [];
-      data.movies.forEach(function(movie) {
-        movies.push(movie);
-      });
-      return next(null, movies);
+      return next(null, data.movies);
     }),
     logCmd = plissken.CmdFactory.newLogCmd(function(movie) {
       console.log("%d -> %s (%s)", movie.id, movie.title, movie.year);
@@ -52,6 +48,7 @@ var plissken = require('./index');
       console.log('Extending movie ' + movie.id + '...');
       movie.genres = xMovie.genres;
       movie.runtime = xMovie.runtime;
+      if (movie.id === 15) return next(null, null); // Test removing a movie.
       return next(null, movie);
     }),
     saveCmd = plissken.CmdFactory.newSaveCmd(function(movie) {
