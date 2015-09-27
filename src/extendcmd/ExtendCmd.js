@@ -7,6 +7,8 @@
 
 var async = require('async'),
   Cmd = require('./../cmd/Cmd'),
+  Datasrc = require('./../datasrc/Datasrc'),
+  SrcManager = require('./../datasrc/SrcManager'),
   accept = require('./accept');
 
 /**
@@ -18,6 +20,7 @@ var async = require('async'),
  */
 function ExtendCmd(urlFn, acceptFn, extendFn, opts) {
   Cmd.call(this, 'ExtendCmd');
+  this.srcManager = false;
   this.urlFn = urlFn;
   this.acceptFn = acceptFn || accept;
   this.extendFn = extendFn;
@@ -32,16 +35,22 @@ ExtendCmd.prototype.constructor = ExtendCmd;
  * @param {Object} Data source
  */
 ExtendCmd.prototype.setDatasrc = function setDatasrc(datasrc) {
+  if (!datasrc instanceof Datasrc) {
+    throw new Error('Argument must be an instance of Datasrc');
+  }
   this.datasrc = datasrc;
+  this.srcManager = new SrcManager(this.datasrc, this.opts.concurrency);
 };
 
 /**
+ * Delegates the request to SrcManager and validates the response
+ * @param {Object} Request
  * @param {Function} Callback
  */
-ExtendCmd.prototype._get = function _get(opts, next) {
+ExtendCmd.prototype._get = function _get(req, next) {
   var self = this;
   // Carry out the actual HTTP(S) request.
-  return this.datasrc.get(opts, function(err, res) {
+  return this.srcManager.get(req, function(err, res) {
     return self.acceptFn.call(self.context, err, res, function(err, elem) {
       if (err) {
         return next(err);
@@ -64,11 +73,11 @@ ExtendCmd.prototype.exec = function exec(next) {
   // 6. Store results
   var self = this;
   return async.map(this.context.__elems, function(elem, aNext) {
-    var opts = self.urlFn.call(self.context, elem, {});
-    if (!opts || typeof opts !== 'object' || !opts.url) {
+    var req = self.urlFn.call(self.context, elem, {});
+    if (!req || typeof req !== 'object' || !req.url) {
       return aNext(new Error('"urlFn" must provide a relative URL to request'));
     }
-    return self._get(opts, function(err, res, xElem) {
+    return self._get(req, function(err, res, xElem) {
       if (err) return aNext(err);
       return self.extendFn.call(self.context, elem, xElem, res, aNext);
     });

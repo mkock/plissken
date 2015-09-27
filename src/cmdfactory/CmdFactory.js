@@ -94,8 +94,9 @@ module.exports = (function() {
         _acceptFn = null;
         _extendFn = acceptFn;
       } else if (arguments.length > 2) {
-        // The two required arguments are provided, and a custom "acceptFn".
-        if (typeof acceptFn !== 'function') {
+        // The two required arguments are provided, and optionally a
+        // custom "acceptFn".
+        if (acceptFn && typeof acceptFn !== 'function') {
           throw new Error('Second argument must be a function');
         }
         if (typeof extendFn !== 'function') {

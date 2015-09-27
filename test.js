@@ -40,14 +40,14 @@ var plissken = require('./index');
       return next(null, movies);
     }),
     logCmd = plissken.CmdFactory.newLogCmd(function(movie) {
-      console.log(movie.year + " -> " + movie.title);
+      console.log("%d -> %s (%s)", movie.id, movie.title, movie.year);
     }),
     filterCmd = plissken.CmdFactory.newFilterCmd(function(movie, next) {
       return next(movie.year <= 2000);
     }),
-    extendCmd = plissken.CmdFactory.newExtendCmd(function(movie, opts) {
-      opts.url = 'movies/' + movie.id;
-      return opts;
+    extendCmd = plissken.CmdFactory.newExtendCmd(function(movie, req) {
+      req.url = 'movies/' + movie.id;
+      return req;
     }, function(movie, xMovie, response, next) {
       console.log('Extending movie ' + movie.id + '...');
       movie.genres = xMovie.genres;
