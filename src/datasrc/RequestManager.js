@@ -6,12 +6,12 @@
  'use strict';
 
 var async = require('async'),
-  debug = require('debug')('plissken:SrcManager');
+  debug = require('debug')('plissken:RequestManager');
 
 /**
  * @Constructor
  */
-function SrcManager(datasrc, concurrency) {
+function RequestManager(datasrc, concurrency) {
   var self = this;
   if (concurrency && (typeof concurrency !== 'number' || concurrency < 1)) {
     throw new Error('Parameter "concurrency" must be a positive number');
@@ -28,7 +28,7 @@ function SrcManager(datasrc, concurrency) {
  * @param {Array} List of Datasrc options
  * @param {Function} Callback
  */
-SrcManager.prototype._worker = function _worker(tasks, next) {
+RequestManager.prototype._worker = function _worker(tasks, next) {
   debug('Making %d concurrent requests', tasks.length);
   async.parallel(tasks, function(err, res) {
     return next(err);
@@ -36,11 +36,11 @@ SrcManager.prototype._worker = function _worker(tasks, next) {
 };
 
 /**
- * Make a request under SrcManager's control
+ * Make a request under RequestManager's control
  * @param {Object} Request that will be provided to Datasrc
  * @param {Function} Callback
  */
-SrcManager.prototype.get = function get(req, next) {
+RequestManager.prototype.get = function get(req, next) {
   var self = this,
     _err, _res;
   return this.cargo.push(function(aNext) {
@@ -55,4 +55,4 @@ SrcManager.prototype.get = function get(req, next) {
 };
 
 // Export the constructor.
-module.exports = SrcManager;
+module.exports = RequestManager;

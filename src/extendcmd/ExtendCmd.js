@@ -8,7 +8,7 @@
 var async = require('async'),
   Cmd = require('./../cmd/Cmd'),
   Datasrc = require('./../datasrc/Datasrc'),
-  SrcManager = require('./../datasrc/SrcManager'),
+  RequestManager = require('./../datasrc/RequestManager'),
   accept = require('./accept');
 
 /**
@@ -20,7 +20,7 @@ var async = require('async'),
  */
 function ExtendCmd(urlFn, acceptFn, extendFn, opts) {
   Cmd.call(this, 'ExtendCmd');
-  this.srcManager = false;
+  this.reqManager = false;
   this.urlFn = urlFn;
   this.acceptFn = acceptFn || accept;
   this.extendFn = extendFn;
@@ -39,18 +39,18 @@ ExtendCmd.prototype.setDatasrc = function setDatasrc(datasrc) {
     throw new Error('Argument must be an instance of Datasrc');
   }
   this.datasrc = datasrc;
-  this.srcManager = new SrcManager(this.datasrc, this.opts.concurrency);
+  this.reqManager = new RequestManager(this.datasrc, this.opts.concurrency);
 };
 
 /**
- * Delegates the request to SrcManager and validates the response
+ * Delegates the request to RequestManager and validates the response
  * @param {Object} Request
  * @param {Function} Callback
  */
 ExtendCmd.prototype._get = function _get(req, next) {
   var self = this;
   // Carry out the actual HTTP(S) request.
-  return this.srcManager.get(req, function(err, res) {
+  return this.reqManager.get(req, function(err, res) {
     return self.acceptFn.call(self.context, err, res, function(err, elem) {
       if (err) {
         return next(err);
