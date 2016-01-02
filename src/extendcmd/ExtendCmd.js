@@ -73,18 +73,24 @@ ExtendCmd.prototype.exec = function exec(next) {
   // 6. Store results
   var self = this;
   return async.map(this.context.__elems, function(elem, aNext) {
-    var req = self.urlFn.call(self.context, elem, {});
-    if (!req || typeof req !== 'object' || !req.url) {
-      return aNext(new Error('"urlFn" must provide a relative URL to request'));
-    }
-    return self._get(req, function(err, res, xElem) {
-      if (err) return aNext(err);
-      return self.extendFn.call(self.context, elem, xElem, res, aNext);
+    return self.urlFn.call(self.context, elem, {}, function(err, req) {
+      if (err) {
+        return aNext(err);
+      } else if (!req || typeof req !== 'object' || !req.url) {
+        return aNext(new Error('"urlFn" must provide a relative URL to request'));
+      } else {
+        return self._get(req, function(err, res, xElem) {
+          if (err) return aNext(err);
+          return self.extendFn.call(self.context, elem, xElem, res, aNext);
+        });
+      }
     });
   }, function(err, elems) {
-    // Replace elems by their extended counterparts.
-    self.context.__elems = elems;
-    return next();
+    if (!err) {
+      // Replace elems by their extended counterparts.
+      self.context.__elems = elems;
+    }
+    return next(err);
   });
 };
 

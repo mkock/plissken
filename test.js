@@ -21,7 +21,7 @@ var plissken = require('./index');
     filterCmd = plissken.CmdFactory.newFilterCmd(function(elem, next) {
       return next(elem % 2 === 0);
     }),
-    runner = plissken.newCmdRunner(mock);
+    runner = plissken.newCmdRunner(mock, 'NumberImporter');
     runner.newContext(function() {
     });
   runner.run([getCmd, logCmd, selectCmd, logCmd, filterCmd, logCmd], function(err, data) {
@@ -30,20 +30,22 @@ var plissken = require('./index');
 })();
 
 (function testMovies() {
+  // TODO: Current code requires us to have a SelectCmd due to Context.__content.
   var mock = plissken.newDataSrc({baseUrl: 'http://localhost:3000/'});
   var getCmd = plissken.CmdFactory.newGetCmd('movies'),
     selectCmd = plissken.CmdFactory.newSelectCmd(function(data, next) {
       return next(null, data.movies);
     }),
-    logCmd = plissken.CmdFactory.newLogCmd(function(movie) {
+    logCmd = plissken.CmdFactory.newLogCmd(function(movie, next) {
       console.log("%d -> %s (%s)", movie.id, movie.title, movie.year);
+      return next();
     }),
     filterCmd = plissken.CmdFactory.newFilterCmd(function(movie, next) {
       return next(movie.year <= 2000);
     }),
-    extendCmd = plissken.CmdFactory.newExtendCmd(function(movie, req) {
+    extendCmd = plissken.CmdFactory.newExtendCmd(function(movie, req, next) {
       req.url = 'movies/' + movie.id;
-      return req;
+      return next(null, req);
     }, function(movie, xMovie, response, next) {
       console.log('Extending movie ' + movie.id + '...');
       movie.genres = xMovie.genres;
@@ -51,10 +53,11 @@ var plissken = require('./index');
       if (movie.id === 15) return next(null, null); // Test removing a movie.
       return next(null, movie);
     }),
-    saveCmd = plissken.CmdFactory.newSaveCmd(function(movie) {
+    saveCmd = plissken.CmdFactory.newSaveCmd(function(movie, next) {
       console.log('Saving movie ' + movie.title + '...');
+      return next();
     }),
-    runner = plissken.newCmdRunner(mock);
+    runner = plissken.newCmdRunner(mock, 'MovieImporter');
     runner.newContext(function() {
       this.doneMsg = 'Done!';
     });
@@ -63,7 +66,16 @@ var plissken = require('./index');
       opts.url = opts.url + '/page/' + (++page);
       return opts;
     });
-  runner.run([getCmd, logCmd, selectCmd, logCmd, filterCmd, logCmd, extendCmd, logCmd, saveCmd], function(err, data) {
+  runner.run([
+    getCmd,
+    selectCmd,
+    logCmd,
+    filterCmd,
+    logCmd,
+    extendCmd,
+    logCmd,
+    saveCmd
+  ], function(err, data) {
     console.log(err, data, runner.getContext());
   });
 })();

@@ -11,12 +11,12 @@ var util = require('util'),
 /**
  * @constructor
  */
-function SelectCmd(selectFunc) {
-  if (typeof selectFunc !== 'function') {
+function SelectCmd(selFn) {
+  if (typeof selFn !== 'function') {
     throw new Error('First argument must be a function');
   }
   Cmd.call(this, 'SelectCmd');
-  this.selectFunc = selectFunc;
+  this.selFn = selFn;
 }
 
 // Inherit from Cmd.
@@ -30,10 +30,14 @@ SelectCmd.prototype.constructor = SelectCmd;
  */
 SelectCmd.prototype.exec = function exec(next) {
   var self = this;
-  self.selectFunc.call(self.context, self.context.__elems, function(err, elems) {
-    if (err) return next(err);
+  self.selFn.call(self.context, self.context.__content, function(err, elems) {
+    if (err) {
+      return next(err);
+    } else if (!Array.isArray(elems)) {
+      return next(new Error('"selFn" must return an array of elements'));
+    }
     self.context.__elems = elems;
-    return next(err);
+    return next();
   });
 };
 

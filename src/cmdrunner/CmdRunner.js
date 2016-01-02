@@ -15,7 +15,8 @@ var debug = require('debug')('plissken:CmdRunner'),
 /**
  * @constructor
  */
-function CmdRunner(datasrc) {
+function CmdRunner(datasrc, name) {
+  this.name = name || 'plissken';
   this.cmds = [];
   this.datasrc = datasrc;
   this.pageFn = pagination;
@@ -135,15 +136,19 @@ CmdRunner.prototype.run = function run(cmds, next) {
   validateCmds(cmds);
   this.cmds = cmds;
   listCmds(this.cmds);
+  debug('Starting "%s"', this.name);
   // Stop condition is an Error with name = 'EndOfDataError'.
   async.doWhilst(this._runPages.bind(self), this._isNotDone.bind(self), function(err) {
     self.context.cleanTwo();
     end = new Date();
-    debug('Finished in %s', humanTime(start, end));
-    return next(
-      (err instanceof Error && err.name === 'EndOfDataError' ? null : err),
-      self.context.elems
-    );
+    if (err instanceof Error && err.name === 'EndOfDataError') {
+      // This serves to mark that we're done.
+      debug('Finished "%s" in %s', self.name, humanTime(start, end));
+      return next(null, self.context.elems);
+    } else {
+      if (err) debug('Aborted "%s" due to an error', self.name);
+      return next(err, self.context.elems);
+    }
   });
 };
 

@@ -5,7 +5,8 @@
  */
 'use strict';
 
-var util = require('util'),
+var async = require('async'),
+  util = require('util'),
   Cmd = require('./../cmd/Cmd');
 
 /**
@@ -29,10 +30,9 @@ SaveCmd.prototype.constructor = SaveCmd;
  */
 SaveCmd.prototype.exec = function exec(next) {
   var self = this;
-  Array.prototype.forEach.call(this.context.__elems, function(elem) {
-    return self.saveFn.call(self.context, elem);
-  });
-  return next();
+  async.each(this.context.__elems, function(elem, aNext) {
+    return self.saveFn.call(self.context, elem, aNext);
+  }, next);
 };
 
 // Export the constructor.

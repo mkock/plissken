@@ -59,17 +59,17 @@ GetCmd.prototype.exec = function exec(next) {
   currOpts = onePage ? initOpts : extend(initOpts, currOpts);
   // Carry out the actual HTTP(S) request.
   return this.datasrc.get(currOpts, function(err, res) {
-    return self.acceptFn.call(self.context, err, res, function(err, elems) {
+    return self.acceptFn.call(self.context, err, res, function(err, content) {
       var eofErr;
       if (err) {
         return next(err);
-      } else if (!onePage && typeof elems === 'boolean' && !elems) {
+      } else if (!onePage && typeof content === 'boolean' && !content) {
         eofErr = new Error('No more elems available');
         eofErr.name = 'EndOfDataError';
         return next(eofErr, null);
       }
       self.context.__done = onePage;
-      self.context.__elems = elems;
+      self.context.__content = content;
       self.context._response = res;
       return next();
     });

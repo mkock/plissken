@@ -15,8 +15,8 @@ module.exports = {
     return new Datasrc(opts, retryOpts);
   },
 
-  newCmdRunner: function(datasrc) {
-    return new CmdRunner(datasrc);
+  newCmdRunner: function(datasrc, name) {
+    return new CmdRunner(datasrc, name);
   },
 
   CmdFactory: Factory

@@ -16,7 +16,7 @@ var debug = require('debug')('plissken:Datasrc'),
 function Datasrc(opts, retryOpts) {
   this.opts = extend({
     headers: {
-      'User-Agent': 'plissken'
+      'User-Agent': 'node.js/plissken'
     }
   }, opts);
   this.retryOpts = retryOpts || {

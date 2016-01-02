@@ -9,6 +9,7 @@
  * Logs the entire element.
  * @param {Object} Element
  */
-module.exports = function(elem) {
+module.exports = function(elem, next) {
   console.log(elem);
+  return next();
 };
