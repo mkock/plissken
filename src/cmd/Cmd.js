@@ -26,7 +26,7 @@ util.inherits(Cmd, EventEmitter);
 /**
  * @return {String} Cmd name
  */
-Cmd.prototype.getName = function getName() {
+Cmd.prototype.getName = function() {
   return this.name;
 };
 
@@ -34,7 +34,7 @@ Cmd.prototype.getName = function getName() {
  * Sets the Cmd context
  * @param {Object} Cmd context (injected by CmdRunner)
  */
-Cmd.prototype.setContext = function setContex(context) {
+Cmd.prototype.setContext = function(context) {
   this.context = context;
   this.context._cmdName = this.name;
 };
@@ -43,7 +43,7 @@ Cmd.prototype.setContext = function setContex(context) {
  * Returns the Cmd context
  * @return {Object} Context
  */
-Cmd.prototype.getContext = function getContext() {
+Cmd.prototype.getContext = function() {
   return this.context;
 };
 

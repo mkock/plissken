@@ -29,7 +29,7 @@ FilterCmd.prototype.constructor = FilterCmd;
  * Executes this Cmd
  * @param {Function} next(err) Callback
  */
-FilterCmd.prototype.exec = function exec(next) {
+FilterCmd.prototype.exec = function(next) {
   var self = this;
   async.filter(this.context.__elems, this.filterFn.bind(this.context), function(elems) {
     self.context.__elems = elems;

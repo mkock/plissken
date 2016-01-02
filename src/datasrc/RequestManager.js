@@ -28,7 +28,7 @@ function RequestManager(datasrc, concurrency) {
  * @param {Array} List of Datasrc options
  * @param {Function} Callback
  */
-RequestManager.prototype._worker = function _worker(tasks, next) {
+RequestManager.prototype._worker = function(tasks, next) {
   debug('Making %d concurrent requests', tasks.length);
   async.parallel(tasks, function(err, res) {
     return next(err);
@@ -40,7 +40,7 @@ RequestManager.prototype._worker = function _worker(tasks, next) {
  * @param {Object} Request that will be provided to Datasrc
  * @param {Function} Callback
  */
-RequestManager.prototype.get = function get(req, next) {
+RequestManager.prototype.get = function(req, next) {
   var self = this,
     _err, _res;
   return this.cargo.push(function(aNext) {

@@ -48,7 +48,7 @@ function checkOpts(opts) {
  * @param {Object} Options
  * @param {Function} Next
  */
-Datasrc.prototype.get = function get(opts, next) {
+Datasrc.prototype.get = function(opts, next) {
   var self = this,
     op = retry.operation(this.retryOpts);
   this.opts = makeOpts(this.opts, opts);

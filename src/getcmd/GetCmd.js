@@ -50,7 +50,7 @@ GetCmd.prototype.setPageFn = function setPageFn(pageFn) {
  * @param {Function} next(err) Callback
  * @return {Object}
  */
-GetCmd.prototype.exec = function exec(next) {
+GetCmd.prototype.exec = function(next) {
   var self = this,
     initOpts = {url: this.relUrl},
     currOpts = this.pageFn(initOpts),

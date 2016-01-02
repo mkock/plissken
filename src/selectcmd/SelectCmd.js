@@ -28,7 +28,7 @@ SelectCmd.prototype.constructor = SelectCmd;
  * @param {Function} Callback(err)
  * @return {Object}
  */
-SelectCmd.prototype.exec = function exec(next) {
+SelectCmd.prototype.exec = function(next) {
   var self = this;
   self.selFn.call(self.context, self.context.__content, function(err, elems) {
     if (err) {

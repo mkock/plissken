@@ -34,7 +34,7 @@ ExtendCmd.prototype.constructor = ExtendCmd;
 /**
  * @param {Object} Data source
  */
-ExtendCmd.prototype.setDatasrc = function setDatasrc(datasrc) {
+ExtendCmd.prototype.setDatasrc = function(datasrc) {
   if (!datasrc instanceof Datasrc) {
     throw new Error('Argument must be an instance of Datasrc');
   }
@@ -47,7 +47,7 @@ ExtendCmd.prototype.setDatasrc = function setDatasrc(datasrc) {
  * @param {Object} Request
  * @param {Function} Callback
  */
-ExtendCmd.prototype._get = function _get(req, next) {
+ExtendCmd.prototype._get = function(req, next) {
   var self = this;
   // Carry out the actual HTTP(S) request.
   return this.reqManager.get(req, function(err, res) {
@@ -64,7 +64,7 @@ ExtendCmd.prototype._get = function _get(req, next) {
  * Executes this Cmd
  * @param {Function} next(err) Callback
  */
-ExtendCmd.prototype.exec = function exec(next) {
+ExtendCmd.prototype.exec = function(next) {
   // 1. Iterate elems
   // 2. Call urlFn to get URL
   // 3. Make request

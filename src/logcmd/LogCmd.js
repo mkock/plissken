@@ -31,7 +31,7 @@ LogCmd.prototype.constructor = LogCmd;
  * @param {Function} next(err) Callback
  * @return {Object}
  */
-LogCmd.prototype.exec = function exec(next) {
+LogCmd.prototype.exec = function(next) {
   var self = this;
   async.eachSeries(this.context.__elems, function(elem, aNext) {
     return self.logFn.call(self.context, elem, aNext);

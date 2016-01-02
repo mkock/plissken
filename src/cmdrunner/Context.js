@@ -17,7 +17,7 @@ function Context() {
 /**
  * Cleans up temporary variables (starting with "_")
  */
-Context.prototype.cleanOne = function cleanOne() {
+Context.prototype.cleanOne = function() {
   debug('Cleaning variables with single underscore');
   for (var key in this) {
     if (key.substring(0, 1) === '_' && key.substring(1, 2) !== '_') {
@@ -29,7 +29,7 @@ Context.prototype.cleanOne = function cleanOne() {
 /**
  * Cleans up temporary variables (starting with "__")
  */
-Context.prototype.cleanTwo = function cleanTwo() {
+Context.prototype.cleanTwo = function() {
   debug('Cleaning variables with double underscore');
   for (var key in this) {
     if (key.substring(0, 2) === '__' && key.substring(2, 3) !== '_') {
@@ -41,7 +41,7 @@ Context.prototype.cleanTwo = function cleanTwo() {
 /**
  * Removes all elems that are empty (null, undefined or false)
  */
-Context.prototype.rmEmptyElems = function rmEmptyElems() {
+Context.prototype.rmEmptyElems = function() {
   debug('Cleaning empty elements');
   this.elems = this.elems.filter(Boolean);
   if (this.__elems && Array.isArray(this.__elems) && this.__elems.length) {

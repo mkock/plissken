@@ -28,7 +28,7 @@ SaveCmd.prototype.constructor = SaveCmd;
  * Executes this Cmd
  * @param {Function} next(err) Callback
  */
-SaveCmd.prototype.exec = function exec(next) {
+SaveCmd.prototype.exec = function(next) {
   var self = this;
   async.each(this.context.__elems, function(elem, aNext) {
     return self.saveFn.call(self.context, elem, aNext);

@@ -48,7 +48,7 @@ function humanTime(start, end) {
 /**
  * @param {Function} User function which can create context data using "this"
  */
-CmdRunner.prototype.newContext = function newContext(fn) {
+CmdRunner.prototype.newContext = function(fn) {
   if (typeof fn !== 'function') {
     throw new Error('First argument must be a function');
   }
@@ -59,7 +59,7 @@ CmdRunner.prototype.newContext = function newContext(fn) {
  * Returns the context for this CmdRunner
  * @return {Object} Context
  */
-CmdRunner.prototype.getContext = function getContext() {
+CmdRunner.prototype.getContext = function() {
   return this.context;
 };
 
@@ -85,7 +85,7 @@ function validateCmds(cmds) {
  * Runs a single iteration of commands in a repeatable fashion
  * @param {Function} Callback
  */
-CmdRunner.prototype._runPages = function _runPages(next) {
+CmdRunner.prototype._runPages = function(next) {
   var self = this;
   this.context.__step = 0;
   // Run Cmds one by one.
@@ -118,7 +118,7 @@ CmdRunner.prototype._runPages = function _runPages(next) {
  * @return {Boolean} True if GetCmd has marked that it's done, False otherwise
  * @private
  */
-CmdRunner.prototype._isNotDone = function _isNotDone() {
+CmdRunner.prototype._isNotDone = function() {
   return !this.context.__done;
 };
 
@@ -129,7 +129,7 @@ CmdRunner.prototype._isNotDone = function _isNotDone() {
  *   a nested array per iteration (corresponds to the number of pages processed)
  * @public
  */
-CmdRunner.prototype.run = function run(cmds, next) {
+CmdRunner.prototype.run = function(cmds, next) {
   var self = this,
     start = new Date(),
     end;
@@ -158,7 +158,7 @@ CmdRunner.prototype.run = function run(cmds, next) {
  * required for fetching the next page.
  * @param {Function} Pagination function
  */
-CmdRunner.prototype.paginate = function paginate(pageFn) {
+CmdRunner.prototype.paginate = function(pageFn) {
   this.pageFn = pagination.pageFn || pageFn;
   if (typeof pageFn !== 'function') {
     throw new Error('Argument must be a function');
