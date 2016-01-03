@@ -17,7 +17,8 @@ function RequestManager(datasrc, concurrency) {
     throw new Error('Parameter "concurrency" must be a positive number');
   }
   this.datasrc = datasrc;
-  this.cargo = async.cargo(this._worker.bind(this), concurrency);
+  this.concurrency = concurrency;
+  this.cargo = async.cargo(this._worker.bind(this), this.concurrency);
   this.cargo.saturated = function() {
     debug('Starting to queue requests (queue size is %d)', self.cargo.length());
   };
@@ -53,6 +54,22 @@ RequestManager.prototype.get = function(req, next) {
     return next(_err, _res);
   });
 };
+
+/**
+ * Returns the currently used Datasrc object.
+ * @return {Object} Datasrc
+ */
+RequestManager.prototype.getDatasrc = function() {
+  return this.datasrc;
+}
+
+/**
+ * Returns the current concurrency value.
+ * @return {Number} Concurrency
+ */
+RequestManager.prototype.getConcurrency = function() {
+  return this.concurrency;
+}
 
 // Export the constructor.
 module.exports = RequestManager;
