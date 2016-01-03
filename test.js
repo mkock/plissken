@@ -53,6 +53,10 @@ var plissken = require('./index');
       if (movie.id === 15) return next(null, null); // Test removing a movie.
       return next(null, movie);
     }),
+    customCmd = plissken.CmdFactory.newCustomCmd(function(movie, next) {
+      movie.source = 'IMDB';
+      return next(null, movie);
+    }),
     saveCmd = plissken.CmdFactory.newSaveCmd(function(movie, next) {
       console.log('Saving movie ' + movie.title + '...');
       return next();
@@ -73,6 +77,8 @@ var plissken = require('./index');
     filterCmd,
     logCmd,
     extendCmd,
+    logCmd,
+    customCmd,
     logCmd,
     saveCmd
   ], function(err, data) {

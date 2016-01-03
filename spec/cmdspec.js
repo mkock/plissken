@@ -10,13 +10,14 @@
  */
 describe('Plissken Cmd Test Suite', function() {
 
+  var Context = require('./../src/cmdrunner/Context');
+
   /**
    * Test Cmd
    */
   describe('Cmd Tests', function() {
 
-    var Cmd = require('./../src/cmd/Cmd'),
-      Context = require('./../src/cmdrunner/Context');
+    var Cmd = require('./../src/cmd/Cmd');
 
     it('remembers its name', function() {
       var cmd = new Cmd('MyCmd');
@@ -38,8 +39,7 @@ describe('Plissken Cmd Test Suite', function() {
    */
   describe('LogCmd Tests', function() {
 
-    var LogCmd = require('./../src/logcmd/LogCmd'),
-      Context = require('./../src/cmdrunner/Context');
+    var LogCmd = require('./../src/logcmd/LogCmd');
 
     it('accepts a logFn', function() {
       var logCmd = new LogCmd(function() {});
@@ -66,8 +66,8 @@ describe('Plissken Cmd Test Suite', function() {
   });
 
   describe('SelectCmd Tests', function() {
-    var SelectCmd = require('./../src/selectcmd/SelectCmd'),
-      Context = require('./../src/cmdrunner/Context');
+
+    var SelectCmd = require('./../src/selectcmd/SelectCmd');
 
     it('accepts a selFn', function() {
       var selectCmd = new SelectCmd(function() {});
@@ -93,9 +93,50 @@ describe('Plissken Cmd Test Suite', function() {
 
   });
 
+  describe('CustomCmd Tests', function() {
+
+    var CustomCmd = require('./../src/customcmd/CustomCmd');
+
+    it('accepts a customFn', function() {
+      var customCmd = new CustomCmd(function() {});
+      expect(customCmd.customFn).toBeDefined();
+    });
+
+    it('binds "this" to Context for customFn', function() {
+      var thisRef,
+        context = new Context(),
+        customCmd = new CustomCmd(function(elem, next) {
+          thisRef = this;
+          return next(null, elem);
+        });
+        context.foo = 'bar';
+        context.__elems = ['something'];
+      customCmd.setContext(context);
+      customCmd.exec(function() {
+        expect(typeof thisRef).toEqual('object');
+        expect(thisRef.foo).toBeDefined();
+        expect(thisRef.foo).toEqual('bar');
+      });
+    });
+
+    it('omits elements that the custom function never returns', function() {
+      var context = new Context(),
+        customCmd = new CustomCmd(function(elem, next) {
+          return next();
+        });
+        context.foo = 'bar';
+        context.__elems = ['something'];
+      customCmd.setContext(context);
+      customCmd.exec(function() {
+        expect(context.__elems).not.toContain('something');
+      });      
+    });
+
+  });
+
   describe('SaveCmd Tests', function() {
-    var SaveCmd = require('./../src/savecmd/SaveCmd'),
-      Context = require('./../src/cmdrunner/Context');
+
+    var SaveCmd = require('./../src/savecmd/SaveCmd');
 
     it('accepts a saveFn', function() {
       var saveCmd = new SaveCmd(function() {});

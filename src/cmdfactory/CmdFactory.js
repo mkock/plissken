@@ -11,6 +11,7 @@ var util = require('util'),
   FilterCmd = require('./../filtercmd/FilterCmd'),
   SelectCmd = require('./../selectcmd/SelectCmd'),
   ExtendCmd = require('./../extendcmd/ExtendCmd'),
+  CustomCmd = require('./../customcmd/CustomCmd'),
   SaveCmd = require('./../savecmd/SaveCmd');
 
 /**
@@ -106,6 +107,14 @@ module.exports = (function() {
         _extendFn = extendFn;
       }
       return new ExtendCmd(urlFn, _acceptFn, _extendFn, opts);
+    },
+
+    /**
+     * @param {Function} Custom function to run on each element.
+     * @return {Object} CustomCmd
+     */
+    newCustomCmd: function(customFn) {
+      return new CustomCmd(customFn);
     },
 
     /**
