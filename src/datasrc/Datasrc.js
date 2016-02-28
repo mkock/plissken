@@ -7,6 +7,7 @@
 
 var debug = require('debug')('plissken:Datasrc'),
   request = require('request'),
+  prettyBytes = require('pretty-bytes'),
   retry = require('retry'),
   extend = require('extend');
 
@@ -53,8 +54,15 @@ Datasrc.prototype.get = function(opts, next) {
     op = retry.operation(this.retryOpts);
   this.opts = makeOpts(this.opts, opts);
   op.attempt(function(currAttempt) {
-    debug('GET %s, attempt %d', self.opts.baseUrl + self.opts.url, currAttempt);
+    var url = self.opts.baseUrl + self.opts.url;
+    debug('GET %s, attempt %d', url, currAttempt);
     return request(self.opts, function(err, res, body) {
+      debug('GET %s %d %s, %s',
+        url,
+        res.statusCode,
+        res.statusMessage,
+        prettyBytes(parseInt(res.headers['content-length']) || 0)
+      );
       // TODO: Only retry for timeout responses?
       if (op.retry(err)) return;
       return next(err ? op.mainError() : null, {

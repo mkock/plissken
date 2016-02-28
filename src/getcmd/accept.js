@@ -7,6 +7,12 @@
 
 var xml2json = require('xml2json');
 
+var xmlOpts = {
+  coerce: false,
+  sanitize: false,
+  trim: true
+};
+
 /**
  * @param {Object} HTTP response
  * @param {String} Body
@@ -16,7 +22,7 @@ function toJSON(res, body, next) {
   if (/^application\/json/.test(res.headers['content-type'])) {
     return next(null, JSON.parse(body));
   } else if (/^application\/xml/.test(res.headers['content-type'])) {
-    return next(null, xml2json.toJson(body));
+    return next(null, xml2json.toJson(body, xmlOpts));
   } else {
     return next(null, body);
   }
