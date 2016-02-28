@@ -7,6 +7,7 @@
 
 var debug = require('debug')('plissken:CmdRunner'),
   date = require('date-extended'),
+  prettyMs = require('pretty-ms'),
   async = require('async'),
   Cmd = require('./../cmd/Cmd'),
   Context = require('./Context'),
@@ -21,28 +22,6 @@ function CmdRunner(datasrc, name) {
   this.datasrc = datasrc;
   this.pageFn = pagination;
   this.context = new Context();
-}
-
-/**
- * Returns time passed in a human readable format
- * @param {Object} Date representing start time
- * @param {Object} Date representing end time
- * @return {String} Human readable time
- */
-function humanTime(start, end) {
-  var secs = date.difference(start, end, 'seconds'),
-    mins, hours;
-  if (secs < 60) {
-    return secs + (secs === 1 ? ' second' : ' seconds');
-  } else {
-    mins = date.difference(start, end, 'minutes');
-    if (mins < 60) {
-      return mins + (mins === 1 ? ' minute' : ' minutes');
-    } else {
-      hours = date.difference(start, end, 'hours');
-      return hours + (hours === 1 ? ' hour' : ' hours');
-    }
-  }
 }
 
 /**
@@ -143,7 +122,11 @@ CmdRunner.prototype.run = function(cmds, next) {
     end = new Date();
     if (err instanceof Error && err.name === 'EndOfDataError') {
       // This serves to mark that we're done.
-      debug('Finished "%s" in %s', self.name, humanTime(start, end));
+      debug(
+        'Finished "%s" in %s',
+        self.name,
+        prettyMs(date.difference(start, end, 'milliseconds'))
+      );
       return next(null, self.context.elems);
     } else {
       if (err) debug('Aborted "%s" due to an error', self.name);
