@@ -24,7 +24,7 @@
     "extend": "^3.0.0",
     "pretty-bytes": "^3.0.1",
     "pretty-ms": "^2.1.0",
-    "request": "^2.69.0",
+    "request": "^2.70.0",
     "retry": "^0.8.0",
     "xml2json": "^0.8.2"
   },
